@@ -6,12 +6,22 @@ export interface ShapeProps {
   color?: string;
 }
 
+interface Point {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 abstract class Shape {
   x: number;
   y: number;
   width: number;
   height: number;
   color: string;
+  public resizing: boolean;
+
+  resizePoints: Point[];
 
   constructor({ x, y, width, height, color }: ShapeProps) {
     this.x = x;
@@ -19,11 +29,108 @@ abstract class Shape {
     this.width = width;
     this.height = height;
     this.color = color ?? "blue";
+
+    this.resizing = false;
+
+    this.resizePoints = [
+      { x: this.x - 4, y: this.y - 4, width: 8, height: 8 },
+      { x: this.x + this.width - 4, y: this.y - 4, width: 8, height: 8 },
+      { x: this.x - 4, y: this.y + this.height - 4, width: 8, height: 8 },
+      {
+        x: this.x + this.width - 4,
+        y: this.y + this.height - 4,
+        width: 8,
+        height: 8,
+      },
+    ];
   }
 
   abstract render(context: CanvasRenderingContext2D): void;
 
-  abstract handleClick(event: MouseEvent): void;
+  handleClick(event: MouseEvent): void {
+    const mx = event.offsetX;
+    const my = event.offsetY;
+
+    if (
+      mx >= this.x &&
+      mx <= this.x + this.width &&
+      my >= this.y &&
+      my <= this.y + this.height
+    ) {
+      this.resizing = !this.resizing;
+    }
+  }
+
+  showResize(context: CanvasRenderingContext2D) {
+    context.lineWidth = 2;
+    context.strokeStyle = "#3E64FF";
+    context.strokeRect(this.x, this.y, this.width, this.height);
+    context.stroke();
+
+    context.fillStyle = "#FFFFFF";
+
+    this.resizePoints.forEach((point) => {
+      context.fillRect(point.x, point.y, point.width, point.height);
+      context.strokeRect(point.x, point.y, point.width, point.height);
+    });
+  }
+
+  handleResize(canvas: HTMLCanvasElement) {
+    canvas.onpointerdown = (ev: PointerEvent) => {
+      if (this.resizing) {
+        let mx = ev.offsetX;
+        let my = ev.offsetY;
+
+        this.resizePoints.forEach((point) => {
+          if (
+            mx >= point.x &&
+            mx <= point.x + point.width &&
+            my >= point.y &&
+            my <= point.y + point.height
+          ) {
+            canvas.onpointermove = (mev: PointerEvent) => {
+              const newMX = mev.offsetX;
+              const newMY = mev.offsetY;
+
+              this.width += newMX - mx;
+              this.height += newMY - my;
+
+              mx = newMX;
+              my = newMY;
+
+              this.resizePoints = [
+                { x: this.x - 4, y: this.y - 4, width: 8, height: 8 },
+                {
+                  x: this.x + this.width - 4,
+                  y: this.y - 4,
+                  width: 8,
+                  height: 8,
+                },
+                {
+                  x: this.x - 4,
+                  y: this.y + this.height - 4,
+                  width: 8,
+                  height: 8,
+                },
+                {
+                  x: this.x + this.width - 4,
+                  y: this.y + this.height - 4,
+                  width: 8,
+                  height: 8,
+                },
+              ];
+            };
+          }
+        });
+      } else {
+        canvas.onpointermove = null;
+      }
+    };
+
+    canvas.onpointerup = () => {
+      canvas.onpointermove = null;
+    };
+  }
 }
 
 export default Shape;

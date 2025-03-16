@@ -10,6 +10,8 @@ class Canvas {
   private context;
   private elements: Shape[];
 
+  private target?: Shape;
+
   constructor({ width, height }: CanvasProps) {
     this.canvas = document.createElement("canvas");
     this.canvas.width = width;
@@ -36,6 +38,7 @@ class Canvas {
     });
 
     this.handleClick();
+    this.handleDrag();
 
     requestAnimationFrame(() => this.animate(context));
   }
@@ -44,8 +47,23 @@ class Canvas {
     this.canvas.onclick = (event: MouseEvent) => {
       this.elements.forEach((element) => {
         element.handleClick(event);
+
+        if (element.resizing) {
+          this.target = element;
+          this.elements.forEach((elm) => {
+            if (elm !== element) {
+              elm.resizing = false;
+            }
+          });
+        }
       });
     };
+  }
+
+  private handleDrag() {
+    if (this.target && this.target.resizing) {
+      this.target.handleResize(this.canvas);
+    }
   }
 }
 
