@@ -32,20 +32,39 @@ class Rectangle extends Shape {
     this.clicked = !this.clicked;
 
     if (this.clicked) {
-      context.lineWidth = 3;
-      context.strokeStyle = "black";
-      context.strokeRect(this.x, this.y, this.width, this.height);
-      context.stroke();
+      this.enableResize(context);
     } else {
-      context.clearRect(
-        this.x - 3,
-        this.y - 3,
-        this.width + 6,
-        this.height + 6
-      );
-      context.fillStyle = this.color;
-      context.fillRect(this.x, this.y, this.width, this.height);
+      this.disableResize(context);
     }
+  }
+
+  enableResize(context: CanvasRenderingContext2D) {
+    context.lineWidth = 2;
+    context.strokeStyle = "#3E64FF";
+    context.strokeRect(this.x, this.y, this.width, this.height);
+    context.stroke();
+
+    context.fillStyle = "#FFFFFF";
+    context.fillRect(this.x - 4, this.y - 4, 8, 8);
+    context.fillRect(this.x + this.width - 4, this.y - 4, 8, 8);
+    context.fillRect(this.x - 4, this.y + this.height - 4, 8, 8);
+    context.fillRect(this.x + this.width - 4, this.y + this.height - 4, 8, 8);
+
+    context.strokeRect(this.x - 4, this.y - 4, 8, 8);
+    context.strokeRect(this.x + this.width - 4, this.y - 4, 8, 8);
+    context.strokeRect(this.x - 4, this.y + this.height - 4, 8, 8);
+    context.strokeRect(this.x + this.width - 4, this.y + this.height - 4, 8, 8);
+  }
+
+  disableResize(context: CanvasRenderingContext2D) {
+    context.clearRect(
+      this.x - 6,
+      this.y - 6,
+      this.width + 12,
+      this.height + 12
+    );
+    context.fillStyle = this.color;
+    context.fillRect(this.x, this.y, this.width, this.height);
   }
 }
 
