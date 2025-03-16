@@ -12,6 +12,7 @@ const r1 = new Rectangle({
   width: 100,
   height: 100,
   draggable: true,
+  resizable: true,
 });
 
 const r2 = new Rectangle({
