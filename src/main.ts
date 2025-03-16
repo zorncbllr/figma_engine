@@ -14,12 +14,12 @@ const r1 = new Rectangle({
 });
 
 const r2 = new Rectangle({
-  x: 250,
-  y: 100,
-  width: 100,
-  height: 100,
+  x: 80,
+  y: 80,
+  width: 300,
+  height: 300,
   color: "red",
 });
 
-canvas.add(r1);
 canvas.add(r2);
+canvas.add(r1);

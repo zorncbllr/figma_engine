@@ -23,10 +23,7 @@ abstract class Shape {
 
   abstract render(context: CanvasRenderingContext2D): void;
 
-  abstract handleClick(
-    event: MouseEvent,
-    context: CanvasRenderingContext2D
-  ): void;
+  abstract handleClick(event: MouseEvent): void;
 }
 
 export default Shape;

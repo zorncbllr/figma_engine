@@ -12,9 +12,13 @@ class Rectangle extends Shape {
   render(context: CanvasRenderingContext2D): void {
     context.fillStyle = this.color;
     context.fillRect(this.x, this.y, this.width, this.height);
+
+    if (this.clicked) {
+      this.showResize(context);
+    }
   }
 
-  handleClick(event: MouseEvent, context: CanvasRenderingContext2D): void {
+  handleClick(event: MouseEvent): void {
     const mx = event.offsetX;
     const my = event.offsetY;
 
@@ -24,21 +28,11 @@ class Rectangle extends Shape {
       my >= this.y &&
       my <= this.y + this.height
     ) {
-      this.toggleResize(context);
+      this.clicked = !this.clicked;
     }
   }
 
-  toggleResize(context: CanvasRenderingContext2D) {
-    this.clicked = !this.clicked;
-
-    if (this.clicked) {
-      this.enableResize(context);
-    } else {
-      this.disableResize(context);
-    }
-  }
-
-  enableResize(context: CanvasRenderingContext2D) {
+  showResize(context: CanvasRenderingContext2D) {
     context.lineWidth = 2;
     context.strokeStyle = "#3E64FF";
     context.strokeRect(this.x, this.y, this.width, this.height);
@@ -54,17 +48,6 @@ class Rectangle extends Shape {
     context.strokeRect(this.x + this.width - 4, this.y - 4, 8, 8);
     context.strokeRect(this.x - 4, this.y + this.height - 4, 8, 8);
     context.strokeRect(this.x + this.width - 4, this.y + this.height - 4, 8, 8);
-  }
-
-  disableResize(context: CanvasRenderingContext2D) {
-    context.clearRect(
-      this.x - 6,
-      this.y - 6,
-      this.width + 12,
-      this.height + 12
-    );
-    context.fillStyle = this.color;
-    context.fillRect(this.x, this.y, this.width, this.height);
   }
 }
 
