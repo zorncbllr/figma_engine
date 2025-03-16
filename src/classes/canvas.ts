@@ -23,6 +23,10 @@ class Canvas {
     this.canvas.style.border = "1px solid red";
     document.body.appendChild(this.canvas);
 
+    this.canvas.onpointerup = () => {
+      this.canvas.onpointermove = null;
+    };
+
     this.animate(this.context);
   }
 
@@ -35,10 +39,17 @@ class Canvas {
 
     this.elements.forEach((element) => {
       element.render(this.context);
+      element.handleDrag(this.canvas);
     });
 
     this.handleClick();
-    this.handleDrag();
+
+    if (this.target) {
+      this.target.handleDrag(this.canvas);
+      if (this.target.active) {
+        this.target.handleResize(this.canvas);
+      }
+    }
 
     requestAnimationFrame(() => this.animate(context));
   }
@@ -48,22 +59,16 @@ class Canvas {
       this.elements.forEach((element) => {
         element.handleClick(event);
 
-        if (element.resizing) {
+        if (element.active) {
           this.target = element;
           this.elements.forEach((elm) => {
             if (elm !== element) {
-              elm.resizing = false;
+              elm.active = false;
             }
           });
         }
       });
     };
-  }
-
-  private handleDrag() {
-    if (this.target && this.target.resizing) {
-      this.target.handleResize(this.canvas);
-    }
   }
 }
 

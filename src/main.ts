@@ -11,6 +11,7 @@ const r1 = new Rectangle({
   y: 100,
   width: 100,
   height: 100,
+  draggable: true,
 });
 
 const r2 = new Rectangle({
@@ -18,6 +19,8 @@ const r2 = new Rectangle({
   y: 100,
   width: 100,
   height: 100,
+  draggable: true,
+  resizable: true,
 });
 
 canvas.add(r1);

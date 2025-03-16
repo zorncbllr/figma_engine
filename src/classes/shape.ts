@@ -4,6 +4,8 @@ export interface ShapeProps {
   width: number;
   height: number;
   color?: string;
+  draggable?: boolean;
+  resizable?: boolean;
 }
 
 interface Point {
@@ -20,18 +22,32 @@ abstract class Shape {
   width: number;
   height: number;
   color: string;
-  public resizing: boolean;
+
+  draggable: boolean;
+  resizable: boolean;
+
+  active: boolean;
 
   resizePoints: Point[];
 
-  constructor({ x, y, width, height, color }: ShapeProps) {
+  constructor({
+    x,
+    y,
+    width,
+    height,
+    color,
+    draggable,
+    resizable,
+  }: ShapeProps) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.color = color ?? "blue";
+    this.draggable = draggable ?? false;
+    this.resizable = resizable ?? false;
 
-    this.resizing = false;
+    this.active = false;
 
     this.resizePoints = this.getResizePoints();
   }
@@ -48,7 +64,7 @@ abstract class Shape {
       my >= this.y &&
       my <= this.y + this.height
     ) {
-      this.resizing = !this.resizing;
+      this.active = !this.active;
     }
   }
 
@@ -67,10 +83,10 @@ abstract class Shape {
   }
 
   handleResize(canvas: HTMLCanvasElement) {
-    canvas.onpointerdown = (ev: PointerEvent) => {
-      if (this.resizing) {
-        let mx = ev.offsetX;
-        let my = ev.offsetY;
+    canvas.onpointerdown = (pdev: PointerEvent) => {
+      if (this.active && this.resizable) {
+        let mx = pdev.offsetX;
+        let my = pdev.offsetY;
 
         this.resizePoints.forEach((point) => {
           if (
@@ -79,9 +95,9 @@ abstract class Shape {
             my >= point.y &&
             my <= point.y + point.height
           ) {
-            canvas.onpointermove = (mev: PointerEvent) => {
-              const newMX = mev.offsetX;
-              const newMY = mev.offsetY;
+            canvas.onpointermove = (pmev: PointerEvent) => {
+              const newMX = pmev.offsetX;
+              const newMY = pmev.offsetY;
 
               if (point.corner == "top-left") {
                 this.x -= mx - newMX;
@@ -118,9 +134,38 @@ abstract class Shape {
         canvas.onpointermove = null;
       }
     };
+  }
 
-    canvas.onpointerup = () => {
-      canvas.onpointermove = null;
+  handleDrag(canvas: HTMLCanvasElement) {
+    canvas.onmousedown = (mdev: MouseEvent) => {
+      let mx = mdev.offsetX;
+      let my = mdev.offsetY;
+
+      if (
+        this.draggable &&
+        this.active &&
+        mx >= this.x + 4 &&
+        mx <= this.x + this.width - 8 &&
+        my >= this.y + 4 &&
+        my <= this.y + this.height - 8
+      ) {
+        canvas.onmousemove = (mmev: MouseEvent) => {
+          const newMX = mmev.offsetX;
+          const newMY = mmev.offsetY;
+
+          this.x += newMX - mx;
+          this.y += newMY - my;
+
+          mx = newMX;
+          my = newMY;
+
+          this.resizePoints = this.getResizePoints();
+        };
+      }
+    };
+
+    canvas.onmouseup = () => {
+      canvas.onmousemove = null;
     };
   }
 

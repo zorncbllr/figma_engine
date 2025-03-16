@@ -9,7 +9,7 @@ class Rectangle extends Shape {
     context.fillStyle = this.color;
     context.fillRect(this.x, this.y, this.width, this.height);
 
-    if (this.resizing) {
+    if (this.active) {
       this.showResize(context);
     }
   }
