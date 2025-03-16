@@ -38,16 +38,24 @@ class Rectangle extends Shape {
     context.strokeRect(this.x, this.y, this.width, this.height);
     context.stroke();
 
-    context.fillStyle = "#FFFFFF";
-    context.fillRect(this.x - 4, this.y - 4, 8, 8);
-    context.fillRect(this.x + this.width - 4, this.y - 4, 8, 8);
-    context.fillRect(this.x - 4, this.y + this.height - 4, 8, 8);
-    context.fillRect(this.x + this.width - 4, this.y + this.height - 4, 8, 8);
+    const resizePoints = [
+      { x: this.x - 4, y: this.y - 4, width: 8, height: 8 },
+      { x: this.x + this.width - 4, y: this.y - 4, width: 8, height: 8 },
+      { x: this.x - 4, y: this.y + this.height - 4, width: 8, height: 8 },
+      {
+        x: this.x + this.width - 4,
+        y: this.y + this.height - 4,
+        width: 8,
+        height: 8,
+      },
+    ];
 
-    context.strokeRect(this.x - 4, this.y - 4, 8, 8);
-    context.strokeRect(this.x + this.width - 4, this.y - 4, 8, 8);
-    context.strokeRect(this.x - 4, this.y + this.height - 4, 8, 8);
-    context.strokeRect(this.x + this.width - 4, this.y + this.height - 4, 8, 8);
+    context.fillStyle = "#FFFFFF";
+
+    resizePoints.forEach((point) => {
+      context.fillRect(point.x, point.y, point.width, point.height);
+      context.strokeRect(point.x, point.y, point.width, point.height);
+    });
   }
 }
 
