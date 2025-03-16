@@ -11,6 +11,7 @@ interface Point {
   y: number;
   width: number;
   height: number;
+  corner: string;
 }
 
 abstract class Shape {
@@ -32,17 +33,7 @@ abstract class Shape {
 
     this.resizing = false;
 
-    this.resizePoints = [
-      { x: this.x - 4, y: this.y - 4, width: 8, height: 8 },
-      { x: this.x + this.width - 4, y: this.y - 4, width: 8, height: 8 },
-      { x: this.x - 4, y: this.y + this.height - 4, width: 8, height: 8 },
-      {
-        x: this.x + this.width - 4,
-        y: this.y + this.height - 4,
-        width: 8,
-        height: 8,
-      },
-    ];
+    this.resizePoints = this.getResizePoints();
   }
 
   abstract render(context: CanvasRenderingContext2D): void;
@@ -92,33 +83,34 @@ abstract class Shape {
               const newMX = mev.offsetX;
               const newMY = mev.offsetY;
 
-              this.width += newMX - mx;
-              this.height += newMY - my;
+              if (point.corner == "top-left") {
+                this.x -= mx - newMX;
+                this.y -= my - newMY;
+                this.width -= newMX - mx;
+                this.height -= newMY - my;
+              }
+
+              if (point.corner == "top-right") {
+                this.y -= my - newMY;
+                this.width += newMX - mx;
+                this.height -= newMY - my;
+              }
+
+              if (point.corner == "bottom-left") {
+                this.x -= mx - newMX;
+                this.width -= newMX - mx;
+                this.height += newMY - my;
+              }
+
+              if (point.corner == "bottom-right") {
+                this.width += newMX - mx;
+                this.height += newMY - my;
+              }
 
               mx = newMX;
               my = newMY;
 
-              this.resizePoints = [
-                { x: this.x - 4, y: this.y - 4, width: 8, height: 8 },
-                {
-                  x: this.x + this.width - 4,
-                  y: this.y - 4,
-                  width: 8,
-                  height: 8,
-                },
-                {
-                  x: this.x - 4,
-                  y: this.y + this.height - 4,
-                  width: 8,
-                  height: 8,
-                },
-                {
-                  x: this.x + this.width - 4,
-                  y: this.y + this.height - 4,
-                  width: 8,
-                  height: 8,
-                },
-              ];
+              this.resizePoints = this.getResizePoints();
             };
           }
         });
@@ -130,6 +122,33 @@ abstract class Shape {
     canvas.onpointerup = () => {
       canvas.onpointermove = null;
     };
+  }
+
+  getResizePoints(): Point[] {
+    return [
+      { x: this.x - 4, y: this.y - 4, width: 8, height: 8, corner: "top-left" },
+      {
+        x: this.x + this.width - 4,
+        y: this.y - 4,
+        width: 8,
+        height: 8,
+        corner: "top-right",
+      },
+      {
+        x: this.x - 4,
+        y: this.y + this.height - 4,
+        width: 8,
+        height: 8,
+        corner: "bottom-left",
+      },
+      {
+        x: this.x + this.width - 4,
+        y: this.y + this.height - 4,
+        width: 8,
+        height: 8,
+        corner: "bottom-right",
+      },
+    ];
   }
 }
 
